@@ -91,7 +91,7 @@ if __name__ == '__main__':
     cpu_nums = int(model_config["CPU_NUMS"])
 
     # 保存的模型名称
-    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "×" + str(input_size) + ".model"
+    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "x" + str(input_size) + ".model"
 
     data_train = list(train_x.numpy().reshape(1,-1, time_step, input_size))
     data_valid = list(valid_x.numpy().reshape(1,-1, time_step, input_size))

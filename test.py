@@ -64,7 +64,7 @@ if __name__ == '__main__':
     output_size = int(model_config["OUTPUT_SIZE"])
 
     # 保存的模型名称
-    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "×" + str(input_size) + ".model"
+    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "x" + str(input_size) + ".model"
     # 判断模型文件是否存在
     model_save_dir = data_config["model_save_dir"]
     model_save_path = os.path.join(model_save_dir, model_save_name)

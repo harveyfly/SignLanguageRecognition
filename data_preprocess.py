@@ -19,9 +19,9 @@ mat_data_dir = './data/SLR_dataset/xf500_body_depth_mat'
 data = []
 label = []
 index = 0
-start_idx = 96
-end_idx = 196
-keyframe_num = 36
+start_idx = 45
+end_idx = 95
+keyframe_num = 20
 for label_dir in os.listdir(mat_data_dir):
     if index >= start_idx and index < end_idx:
         print(label_dir)
