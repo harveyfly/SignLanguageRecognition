@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
     # 保存的模型名称
     model_save_dir = server_config["model_save_dir"]
-    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "x" + str(input_size) + ".model"
+    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "x" + str(input_size) + ".pkl"
     model_save_path = os.path.join(model_save_dir, model_save_name)
     # 判断模型文件是否存在
     if not os.path.exists(model_save_path):
