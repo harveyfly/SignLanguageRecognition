@@ -39,8 +39,8 @@ def predict():
             rec_skelenton_data = rec_data["skeleton_data"]
             skeleton_data_array = np.array(rec_skelenton_data, dtype=np.float32).reshape(rec_time_step, rec_input_size)
             # 按每帧转换为相对坐标
-            # for i in range(rec_time_step):
-            #     skeleton_data_array[i] = abs2rel(skeleton_data_array[i], crop_size)
+            for i in range(rec_time_step):
+                skeleton_data_array[i] = abs2rel(skeleton_data_array[i], crop_size)
             # 转换为tensor
             skeleton_data_tensor = torch.from_numpy(skeleton_data_array).to(device).unsqueeze(0)
             # 计算预测结果
@@ -66,6 +66,20 @@ def getSysParameter():
             "sucess": False,
             "error_msg": "Http method error"
         })
+
+# 加载模型
+def load_checkpoint(filepath, device):
+    checkpoint = torch.load(filepath, map_location=device)
+    model = checkpoint['model']  # 提取网络结构
+    model.load_state_dict(checkpoint['model_state_dict'])  # 加载网络权重参数
+    optimizer = TheOptimizerClass()
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])  # 加载优化器参数
+    
+    for parameter in model.parameters():
+        parameter.requires_grad = False
+    model.eval()
+    
+    return model
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -97,6 +111,9 @@ if __name__ == '__main__':
     # 设置GPU
     use_gpu = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_gpu else "cpu")
+    logger.logger.info(str(device))
+    # 获取gpu名字
+    logger.logger.info(torch.cuda.get_device_name(0))
 
     # 设置随机种子
     torch.manual_seed(int(model_config["SEED"]))
@@ -118,9 +135,8 @@ if __name__ == '__main__':
         exit()
     
     # 加载模型
-    model = torch.load(model_save_path).get('model')
+    model = load_checkpoint(model_save_path, device)
     if use_gpu:
-        model = model.cuda()
-    model.eval()
+        model.to(device)
 
     app.run(host='0.0.0.0', port=5000, debug=True)

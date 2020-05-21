@@ -62,9 +62,6 @@ if __name__ == '__main__':
     data_y = torch.from_numpy(np_data_y)
     # 记录数据集大小
     logger.logger.info(str(data_x.size()))
-    # 打印一帧数据
-    plot_one_data(data_x[0][0])
-
 
     # 分割数据集
     data_len = len(data_x)
@@ -91,17 +88,17 @@ if __name__ == '__main__':
     cpu_nums = int(model_config["CPU_NUMS"])
 
     # 保存的模型名称
-    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "x" + str(input_size) + ".model"
+    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "x" + str(input_size) + ".pkl"
 
+    # 最外层是list，次外层是tuple，内层都是ndarray
     data_train = list(train_x.numpy().reshape(1,-1, time_step, input_size))
     data_valid = list(valid_x.numpy().reshape(1,-1, time_step, input_size))
     data_train.append(list(train_y.numpy().reshape(-1, 1)))
     data_valid.append(list(valid_y.numpy().reshape(-1, 1)))
-
-    # 最外层是list，次外层是tuple，内层都是ndarray
     data_train = list(zip(*data_train))
     data_valid = list(zip(*data_valid))
 
+    # 创建DataLoader
     train_loader = DataLoader(data_train, batch_size=batch_size, num_workers=cpu_nums, pin_memory=True, shuffle=True)
     valid_loader = DataLoader(data_valid, batch_size=batch_size, num_workers=cpu_nums, pin_memory=True, shuffle=True)
 
@@ -114,16 +111,18 @@ if __name__ == '__main__':
     # 定义学习率衰减点，训练到50%和75%时学习率缩小为原来的1/10
     mult_step_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[epoch//2, epoch//4*3], gamma=0.1)
 
-    # 训练+验证
+    # 训练 + 验证
     train_loss = []
     valid_loss = []
+    # 最小验证损失
     min_valid_loss = np.inf
-    for i in range(epoch):
-        total_train_loss = []    
-        rnn.train()     # 进入训练模式
+    for cur_epoch in range(epoch):
+        total_train_loss = []
+        # 进入训练模式
+        rnn.train()
         for step, (b_x, b_y) in enumerate(train_loader):
             b_x = b_x.type(torch.FloatTensor).to(device)
-            b_y = b_y.type(torch.long).to(device)   # CrossEntropy的target是longtensor，且要是1-D，不是one hot编码形式
+            b_y = b_y.type(torch.int).to(device)   # CrossEntropy的target是longtensor，且要是1-D，不是one hot编码形式
             prediction = rnn(b_x)                   # rnn output
             # h_s = h_s.data                        # repack the hidden state, break the connection from last iteration
             # h_c = h_c.data                        # repack the hidden state, break the connection from last iteration
@@ -134,11 +133,12 @@ if __name__ == '__main__':
             total_train_loss.append(loss.item())
         train_loss.append(np.mean(total_train_loss)) # 存入平均交叉熵
         
-        total_valid_loss = [] 
-        rnn.eval()      # 进入验证模式
+        total_valid_loss = []
+        # 进入验证模式
+        rnn.eval()
         for step, (b_x, b_y) in enumerate(valid_loader):
             b_x = b_x.type(torch.FloatTensor).to(device) 
-            b_y = b_y.type(torch.long).to(device) 
+            b_y = b_y.type(torch.int).to(device) 
             with torch.no_grad():
                 prediction = rnn(b_x)               # rnn output
             # h_s = h_s.data                        # repack the hidden state, break the connection from last iteration
@@ -147,14 +147,23 @@ if __name__ == '__main__':
             total_valid_loss.append(loss.item())
         valid_loss.append(np.mean(total_valid_loss))
         
-        if (valid_loss[-1] < min_valid_loss):      
-            torch.save({'epoch': i, 'model': rnn, 'train_loss': train_loss, 'valid_loss': valid_loss[-1]}, 
-                    os.path.join(model_save_dir, model_save_name)) # 保存字典对象，里面'model'的value是模型 
+        # 满足条件保存checkpoint
+        if (valid_loss[-1] < min_valid_loss):
+            checkpoint = {
+                'epoch': cur_epoch,
+                'model': rnn,
+                'model_state_dict': rnn.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(), 
+                'train_loss': train_loss, 
+                'valid_loss': valid_loss
+            }
+            # 保存模型
+            torch.save(checkpoint, os.path.join(model_save_dir, model_save_name)) 
             min_valid_loss = valid_loss[-1]
             
         # 编写日志
         log_string = ('iter: [{:d}/{:d}], train_loss: {:0.6f}, valid_loss: {:0.6f}, '
-                'best_valid_loss: {:0.6f}, lr: {:0.7f}').format((i + 1), epoch,
+                'best_valid_loss: {:0.6f}, lr: {:0.7f}').format((cur_epoch + 1), epoch,
                                         train_loss[-1],
                                         valid_loss[-1],
                                         min_valid_loss,
@@ -163,5 +172,4 @@ if __name__ == '__main__':
         mult_step_scheduler.step()
         # 保存日志
         logger.logger.info(log_string)
-
 

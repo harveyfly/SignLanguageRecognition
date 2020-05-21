@@ -12,8 +12,8 @@ from utils.utils import *
 crop_size = 256
 
 # 需要的关节位置
-# need_index = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
-need_index = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+need_index = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 42, 43, 44, 45, 46, 47, 48, 49]
+# need_index = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
 
 mat_data_dir = './data/SLR_dataset/xf500_body_depth_mat'
 data = []
@@ -23,7 +23,7 @@ index = 0
 start_idx = 45
 end_idx = 95
 # 关键帧数量
-keyframe_num = 30
+keyframe_num = 36
 for index in range(start_idx, end_idx):
     label_dir = "%06d" % index
     print(label_dir)
@@ -36,9 +36,9 @@ for index in range(start_idx, end_idx):
         key_indexes = extract_keyframes_indexes(one_data, keyframe_num)
         # 剔除小于keyframe_num帧数据
         if len(key_indexes) < keyframe_num:
+            print(label_dir + one_mat + "length is too short")
             continue
         key_frames = one_data[key_indexes]
-        # save_one_mat2txt(key_frames[:, need_index], 'test_server.txt')
         one_label_data.append(key_frames)
         pass
     one_label_data_array = np.array(one_label_data, dtype=np.float32)

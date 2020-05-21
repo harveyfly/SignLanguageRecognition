@@ -64,7 +64,7 @@ if __name__ == '__main__':
     output_size = int(model_config["OUTPUT_SIZE"])
 
     # 保存的模型名称
-    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "x" + str(input_size) + ".model"
+    model_save_name = opt.model_name + "_output" + str(output_size) + "_input" + str(time_step) + "x" + str(input_size) + ".pkl"
     # 判断模型文件是否存在
     model_save_dir = data_config["model_save_dir"]
     model_save_path = os.path.join(model_save_dir, model_save_name)
@@ -72,30 +72,28 @@ if __name__ == '__main__':
         logger.logger.error("model file is not existed!")
         exit()
 
+    # 最外层是list，次外层是tuple，内层都是ndarray
     data_test = list(test_x.numpy().reshape(1,-1, time_step, input_size))
     data_test.append(list(test_y.numpy().reshape(-1, 1)))
-
-    # 最外层是list，次外层是tuple，内层都是ndarray
     data_test = list(zip(*data_test))
 
     # 创建DataLoader
     test_loader = DataLoader(data_test, batch_size=batch_size, num_workers=cpu_nums, pin_memory=True, shuffle=False)
 
-    loss_func = nn.CrossEntropyLoss()
     # 测试
-    best_model = torch.load(os.path.join(model_save_dir, model_save_name)).get('model').cuda()
+    best_model = torch.load(os.path.join(model_save_dir, model_save_name)).get('model').to(device)
+    # 开启测试模式
     best_model.eval()
     final_predict = []
     ground_truth = []
 
     for step, (b_x, b_y) in enumerate(test_loader):
         b_x = b_x.type(torch.FloatTensor).to(device) 
-        b_y = b_y.type(torch.long).to(device) 
+        b_y = b_y.type(torch.int).to(device) 
         with torch.no_grad():
             prediction = best_model(b_x)    # rnn output
         # h_s = h_s.data        # repack the hidden state, break the connection from last iteration
         # h_c = h_c.data        # repack the hidden state, break the connection from last iteration
-        loss = loss_func(prediction[:, -1, :], b_y.view(b_y.size()[0]))
         
         ground_truth = ground_truth + b_y.view(b_y.size()[0]).cpu().numpy().tolist()
         final_predict = final_predict + torch.max(prediction[:, -1, :], 1)[1].cpu().data.numpy().tolist()
@@ -104,7 +102,7 @@ if __name__ == '__main__':
     final_predict = np.asarray(final_predict)
 
     accuracy = float((ground_truth == final_predict).astype(int).sum()) / float(final_predict.size)
-    logger.logger.info("test accuracy: " + str(accuracy))
+    logger.logger.info("Test accuracy: " + str(accuracy))
 
 
 

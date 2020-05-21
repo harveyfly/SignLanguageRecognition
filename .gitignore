@@ -2,6 +2,7 @@
 *.zip
 *.mat
 *.npy
+.http
 data/SLR_dataset/xf500_body_depth_mat/
 data/SLR_dataset/xf500_body_depth_txt/
 data/SLR_dataset/xf500_color_video
@@ -18,6 +19,9 @@ data/mnist/
 __pycache__/
 *.py[cod]
 *$py.class
+
+# VScode
+.vscode/
 
 # C extensions
 *.so
