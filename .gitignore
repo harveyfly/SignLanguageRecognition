@@ -12,6 +12,7 @@ data/mnist/
 
 # Model file
 *.model
+*.pkl
 
 # Log file
 *.log
