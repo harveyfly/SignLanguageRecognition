@@ -81,7 +81,7 @@ if __name__ == '__main__':
     # 创建DataLoader
     test_loader = DataLoader(data_test, batch_size=batch_size, num_workers=cpu_nums, pin_memory=True, shuffle=False)
 
-    loss_func = nn.CrossEntropyLoss()    
+    loss_func = nn.CrossEntropyLoss()
     # 测试
     best_model = torch.load(os.path.join(model_save_dir, model_save_name)).get('model').cuda()
     best_model.eval()

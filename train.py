@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 import torchvision
 
 # 切换当前工作目录
-os.chdir('/content/drive/My Drive/SignLanguageRecognition')
+# os.chdir('/content/drive/My Drive/SignLanguageRecognition')
 
 # import 子模块
 from nnet.blstm import blstm
