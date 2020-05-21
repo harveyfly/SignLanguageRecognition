@@ -72,8 +72,6 @@ def load_checkpoint(filepath, device):
     checkpoint = torch.load(filepath, map_location=device)
     model = checkpoint['model']  # 提取网络结构
     model.load_state_dict(checkpoint['model_state_dict'])  # 加载网络权重参数
-    optimizer = TheOptimizerClass()
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])  # 加载优化器参数
     
     for parameter in model.parameters():
         parameter.requires_grad = False
