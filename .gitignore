@@ -2,7 +2,8 @@
 *.zip
 *.mat
 *.npy
-.http
+*.http
+test_*.py
 data/SLR_dataset/xf500_body_depth_mat/
 data/SLR_dataset/xf500_body_depth_txt/
 data/SLR_dataset/xf500_color_video
