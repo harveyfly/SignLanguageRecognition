@@ -122,7 +122,7 @@ if __name__ == '__main__':
         rnn.train()
         for step, (b_x, b_y) in enumerate(train_loader):
             b_x = b_x.type(torch.FloatTensor).to(device)
-            b_y = b_y.type(torch.int).to(device)   # CrossEntropy的target是longtensor，且要是1-D，不是one hot编码形式
+            b_y = b_y.type(torch.long).to(device)   # CrossEntropy的target是longtensor，且要是1-D，不是one hot编码形式
             prediction = rnn(b_x)                   # rnn output
             # h_s = h_s.data                        # repack the hidden state, break the connection from last iteration
             # h_c = h_c.data                        # repack the hidden state, break the connection from last iteration
@@ -138,7 +138,7 @@ if __name__ == '__main__':
         rnn.eval()
         for step, (b_x, b_y) in enumerate(valid_loader):
             b_x = b_x.type(torch.FloatTensor).to(device) 
-            b_y = b_y.type(torch.int).to(device) 
+            b_y = b_y.type(torch.long).to(device) 
             with torch.no_grad():
                 prediction = rnn(b_x)               # rnn output
             # h_s = h_s.data                        # repack the hidden state, break the connection from last iteration

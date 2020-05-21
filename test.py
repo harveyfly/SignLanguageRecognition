@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     for step, (b_x, b_y) in enumerate(test_loader):
         b_x = b_x.type(torch.FloatTensor).to(device) 
-        b_y = b_y.type(torch.int).to(device) 
+        b_y = b_y.type(torch.long).to(device) 
         with torch.no_grad():
             prediction = best_model(b_x)    # rnn output
         # h_s = h_s.data        # repack the hidden state, break the connection from last iteration
