@@ -6,6 +6,7 @@ import argparse
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import DataLoader
 import torchvision
@@ -96,7 +97,11 @@ if __name__ == '__main__':
         # h_c = h_c.data        # repack the hidden state, break the connection from last iteration
         
         ground_truth = ground_truth + b_y.view(b_y.size()[0]).cpu().numpy().tolist()
-        final_predict = final_predict + torch.max(prediction[:, -1, :], 1)[1].cpu().data.numpy().tolist()
+        pre_result = torch.max(F.softmax(prediction[:, -1, :], dim=1), 1)
+        pre_class = pre_result[1].cpu().data.numpy().tolist()
+        # pre_prob = pre_result[0].cpu().data.numpy().tolist()
+        # print(pre_class, pre_prob)
+        final_predict = final_predict + pre_class
 
     ground_truth = np.asarray(ground_truth)
     final_predict = np.asarray(final_predict)

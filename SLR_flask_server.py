@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, json
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 
 # import 子模块
@@ -46,9 +47,14 @@ def predict():
             # 计算预测结果
             with torch.no_grad():
                 prediction = model(skeleton_data_tensor)
-                pre_result = torch.max(prediction[:, -1, :], 1)[1].cpu().data.numpy().tolist()[0]
-            pre_class_name = class_index2name(class_dict, pre_result, dict_start_index)
-            result_dict["prediction"] = pre_class_name
+                pre_result = torch.max(F.softmax(prediction[:, -1, :], dim=1), 1)
+                pre_class = pre_result[1].cpu().data.numpy().tolist()
+                pre_prob = pre_result[0].cpu().data.numpy().tolist()
+            pre_class_name = class_index2name(class_dict, pre_class, dict_start_index)
+            if pre_prob > 0.9:
+                result_dict["prediction"] = pre_class_name
+            else:
+                result_dict["prediction"] = "Unknown"
             result_dict["sucess"] = True
         return jsonify(result_dict)
     
