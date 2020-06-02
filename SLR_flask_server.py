@@ -44,7 +44,7 @@ def predict():
                 return jsonify(result_dict)
             skeleton_data_array = skeleton_data_array[key_indexes]
             # 按每帧转换为相对坐标
-            for i in range(rec_time_step):
+            for i in range(time_step):
                 skeleton_data_array[i] = abs2rel(skeleton_data_array[i], crop_size)
             # 转换为tensor
             skeleton_data_tensor = torch.from_numpy(skeleton_data_array).to(device).unsqueeze(0)
@@ -147,4 +147,4 @@ if __name__ == '__main__':
     if use_gpu:
         model.to(device)
 
-    app.run(host='0.0.0.0', port=61504, debug=True)
+    app.run(host='0.0.0.0', port=60504, debug=True)
