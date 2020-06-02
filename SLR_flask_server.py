@@ -40,6 +40,8 @@ def predict():
             skeleton_data_array = np.array(rec_skelenton_data, dtype=np.float32).reshape(-1, rec_input_size)
             # 提取关键帧
             key_indexes = extract_keyframes_indexes(skeleton_data_array, time_step)
+            if len(key_indexes) < time_step:
+                return jsonify(result_dict)
             skeleton_data_array = skeleton_data_array[key_indexes]
             # 按每帧转换为相对坐标
             for i in range(rec_time_step):
