@@ -12,6 +12,7 @@ import numpy as np
 from utils.logger import *
 from utils.parse_config import *
 from utils.utils import *
+from utils.keyframes import *
 
 # 创建Flask app
 app = Flask(__name__)
@@ -21,7 +22,7 @@ app = Flask(__name__)
 post 数据格式:
 {
     "keyframes_num": "36",
-    "frame_len": "16",
+    "frame_len": "24",
     "skeleton_data": [197.0,228.0,179.0,283.0,...]
 }
 '''
@@ -31,14 +32,15 @@ def predict():
     if request.method == "POST":
         # 获取POST数据
         rec_data = json.loads(request.get_data())
-        rec_time_step = int(rec_data["keyframes_num"])
         rec_input_size = int(rec_data["frame_len"])
-        if rec_time_step != time_step or \
-            rec_input_size != input_size:
+        if rec_input_size != input_size:
             result_dict["error_msg"] = "Input data size error!"
         else:
             rec_skelenton_data = rec_data["skeleton_data"]
-            skeleton_data_array = np.array(rec_skelenton_data, dtype=np.float32).reshape(rec_time_step, rec_input_size)
+            skeleton_data_array = np.array(rec_skelenton_data, dtype=np.float32).reshape(-1, rec_input_size)
+            # 提取关键帧
+            key_indexes = extract_keyframes_indexes(skeleton_data_array, time_step)
+            skeleton_data_array = skeleton_data_array[key_indexes]
             # 按每帧转换为相对坐标
             for i in range(rec_time_step):
                 skeleton_data_array[i] = abs2rel(skeleton_data_array[i], crop_size)
