@@ -16,7 +16,10 @@ class blstm(nn.Module):
                                     # 为False，输入输出数据格式是(seq_len, batch, feature)，
             bidirectional=True      # 双向
         )
-        self.output = nn.Linear(2 * HIDDEN_SIZE, OUTPUT_SIZE)  # 最后一个时序的输出接一个全连接层
+        self.output = nn.Sequential(
+            nn.Linear(2 * HIDDEN_SIZE, OUTPUT_SIZE),  # 最后一个时序的输出接一个全连接层
+            nn.Softmax()
+        )
         self.h_s = None
         self.h_c = None
 
