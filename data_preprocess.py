@@ -16,6 +16,10 @@ need_index = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 42, 
 # need_index = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
 
 mat_data_dir = './data/SLR_dataset/xf500_body_depth_mat'
+save_dir = './data/SLR_dataset/processed'
+if not os.path.exists(save_dir):
+    os.mkdir(save_dir)
+
 data = []
 label = []
 index = 0
@@ -66,6 +70,7 @@ label_array_shuffled = label_array[shuffle_index]
 # 保存文件
 data_npy_name = "SLR_S" + str(start_idx) + "_E" + str(end_idx) + "_K" + str(keyframe_num) + "_body_data.npy"
 label_npy_name = "SLR_S" + str(start_idx) + "_E" + str(end_idx) + "_K" + str(keyframe_num) + "_body_label.npy"
-np.save(os.path.join("./data/SLR_dataset/processed", data_npy_name), data_array_shuffled, allow_pickle=True)
-np.save(os.path.join("./data/SLR_dataset/processed", label_npy_name), label_array_shuffled, allow_pickle=True)
+
+np.save(os.path.join(save_dir, data_npy_name), data_array_shuffled, allow_pickle=True)
+np.save(os.path.join(save_dir, label_npy_name), label_array_shuffled, allow_pickle=True)
 pass

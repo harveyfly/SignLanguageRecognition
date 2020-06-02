@@ -1,7 +1,12 @@
 import logging
+import os
 
 class Logger(object):
-    def __init__(self, log_dir):
+    def __init__(self, log_path):
+        if not os.path.exists(log_path):
+            os.mkdir('./log')
+            with open(log_path, "w") as f:
+                pass
         # 设置logging
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
@@ -10,7 +15,7 @@ class Logger(object):
             datefmt='%Y-%m-%d %H:%M:%S')
 
         # 使用FileHandler输出到文件
-        fh = logging.FileHandler(log_dir)
+        fh = logging.FileHandler(log_path)
         fh.setLevel(logging.INFO)
         fh.setFormatter(formatter)
 
