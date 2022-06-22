@@ -1,4 +1,4 @@
-numpy==1.18.1
+numpy==1.22.0
 torch==1.2.0
 Flask==1.1.2
 torchvision==0.4.0
